@@ -13,7 +13,12 @@ def proof_of_work(block):
     in an effort to find a number that is a valid proof
     :return: A valid proof for the provided block
     """
-    pass
+    block_string = json.dumps(block, sort_keys=True)
+    proof = 0
+    # return proof
+    while valid_proof(block_string, proof) is False:
+        proof += 1
+    return proof
 
 
 def valid_proof(block_string, proof):
@@ -27,7 +32,13 @@ def valid_proof(block_string, proof):
     correct number of leading zeroes.
     :return: True if the resulting hash is a valid proof, False otherwise
     """
-    pass
+    print(f"Checking if {proof} is valid")
+    guess = block_string + str(proof)
+    guess = guess.encode()
+    hash_value = hashlib.sha256(guess).hexdigest()
+    print(hash_value)
+    # return True or False
+    return hash_value[:3] == '000000'
 
 
 if __name__ == '__main__':
