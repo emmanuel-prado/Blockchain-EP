@@ -89,6 +89,7 @@ class Blockchain(object):
         :return: A valid proof for the provided block
         """
         # TODO
+        print("here's the block:", block)
         block_string = json.dumps(block, sort_keys=True)
         proof = 0
         # return proof
@@ -115,7 +116,7 @@ class Blockchain(object):
         hash_value = hashlib.sha256(guess).hexdigest()
         print(hash_value)
         # return True or False
-        return hash_value[:3] == '000000'
+        return hash_value[:3] == '000'
 
 
 # Instantiate our Node

@@ -39,7 +39,7 @@ def valid_proof(block_string, proof):
     hash_value = hashlib.sha256(guess).hexdigest()
     print(hash_value)
     # return True or False
-    return hash_value[:3] == '000000'
+    return hash_value[:6] == '000000'
 
 
 if __name__ == '__main__':
@@ -71,11 +71,10 @@ if __name__ == '__main__':
 
         # TODO: Get the block from `data` and use it to look for a new proof
         # new_proof = ???
-        print(f"Mining has started")
         start_time = time.time()
         new_proof = proof_of_work(data)
         end_time = time.time()
-        print("New proof found")
+        total_time = end_time - start_time
         # When found, POST it to the server {"proof": new_proof, "id": id}
         post_data = {"proof": new_proof, "id": id}
 
@@ -88,6 +87,6 @@ if __name__ == '__main__':
         # print the message from the server.
         if data['message'] == 'New Block Forged':
             coins_mined += 1
-            print(f"Took {end_time - start_time} to mine {coins_mined} coins")
+            print(f"Took {total_time} to mine {coins_mined} coins")
         else:
             print(data['message'])
