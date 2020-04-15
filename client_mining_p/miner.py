@@ -14,7 +14,6 @@ def proof_of_work(block):
     in an effort to find a number that is a valid proof
     :return: A valid proof for the provided block
     """
-    print("here's the block:", block)
     block_string = json.dumps(block, sort_keys=True)
     proof = 0
     # return proof
@@ -40,7 +39,7 @@ def valid_proof(block_string, proof):
     hash_value = hashlib.sha256(guess).hexdigest()
     print(hash_value)
     # return True or False
-    return hash_value[:3] == '0'
+    return hash_value[:3] == '000000'
 
 
 if __name__ == '__main__':
@@ -72,20 +71,23 @@ if __name__ == '__main__':
 
         # TODO: Get the block from `data` and use it to look for a new proof
         # new_proof = ???
+        print(f"Mining has started")
         start_time = time.time()
         new_proof = proof_of_work(data)
         end_time = time.time()
+        print("New proof found")
         # When found, POST it to the server {"proof": new_proof, "id": id}
         post_data = {"proof": new_proof, "id": id}
 
         r = requests.post(url=node + "/mine", json=post_data)
+        print(r)
         data = r.json()
 
         # TODO: If the server responds with a 'message' 'New Block Forged'
         # add 1 to the number of coins mined and print it.  Otherwise,
         # print the message from the server.
-        if data.message == 'New Block Forged':
+        if data['message'] == 'New Block Forged':
             coins_mined += 1
             print(f"Took {end_time - start_time} to mine {coins_mined} coins")
         else:
-            print(data.message)
+            print(data['message'])

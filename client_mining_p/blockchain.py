@@ -97,11 +97,11 @@ def mine():
     # receive and validate OR reject a new proof sent by a client
     # use data = request.get_json() to pull data out of the POST
     data = request.get_json()
-    print(data)
+    print("this is the data:", data['id'])
     # check that proof and id are present
     # return a 400 error using jsonify(response) with a 'message'
     # this message should indicate success or failure
-    if data.id and data.proof:
+    if data['id'] and data['proof']:
         response = {'message': 'New Block Forged'}
         return jsonify(response), 200
     else:
