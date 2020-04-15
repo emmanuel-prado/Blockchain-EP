@@ -1,3 +1,4 @@
+import miner
 import hashlib
 import json
 from time import time
@@ -95,26 +96,17 @@ blockchain = Blockchain()
 def mine():
     # receive and validate OR reject a new proof sent by a client
     # use data = request.get_json() to pull data out of the POST
+    data = request.get_json()
+    print(data)
     # check that proof and id are present
     # return a 400 error using jsonify(response) with a 'message'
     # this message should indicate success or failure
-
-    # @app.route('/mine', methods=['GET'])
-    # def mine():
-    #     # Run the proof of work algorithm to get the next proof
-    #     print("We shall now mine a block!")
-    #     proof = blockchain.proof_of_work(blockchain.last_block)
-    #     print(f"After a long process, we got a value {proof}")
-
-    #     # Forge the new Block by adding it to the chain with the proof
-    #     new_block = blockchain.new_block(proof)
-    #     response = {
-    #         # TODO: Send a JSON response with the new block
-    #         'block': new_block
-    #     }
-
-    #     return jsonify(response), 200
-    return
+    if data.id and data.proof:
+        response = {'message': 'New Block Forged'}
+        return jsonify(response), 200
+    else:
+        response = {'message': 'invalid ID or proof'}
+        return jsonify(response), 400
 
 
 @app.route('/chain', methods=['GET'])
