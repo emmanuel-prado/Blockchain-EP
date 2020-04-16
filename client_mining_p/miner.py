@@ -48,7 +48,8 @@ if __name__ == '__main__':
         node = sys.argv[1]
     else:
         node = "http://localhost:5000"
-
+    # declare variable to keep track of coins mined
+    coins_mined = 0
     # Load ID
     f = open("my_id.txt", "r")
     id = f.read()
@@ -57,7 +58,6 @@ if __name__ == '__main__':
 
     # Run forever until interrupted
     while True:
-        coins_mined = 0
         r = requests.get(url=node + "/last_block")
         # Handle non-json response
         try:
@@ -77,16 +77,17 @@ if __name__ == '__main__':
         total_time = end_time - start_time
         # When found, POST it to the server {"proof": new_proof, "id": id}
         post_data = {"proof": new_proof, "id": id}
-
         r = requests.post(url=node + "/mine", json=post_data)
-        print(r)
         data = r.json()
 
         # TODO: If the server responds with a 'message' 'New Block Forged'
         # add 1 to the number of coins mined and print it.  Otherwise,
         # print the message from the server.
-        if data['message'] == 'New Block Forged':
+        if 'block' in data:
+            # we succeeded
             coins_mined += 1
-            print(f"Took {total_time} to mine {coins_mined} coins")
+            print(f"Took {total_time} to mine coin")
+            print(f"total coins/blocks mined: {coins_mined}")
+            time.sleep(1)
         else:
             print(data['message'])

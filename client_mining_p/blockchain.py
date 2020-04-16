@@ -15,7 +15,7 @@ class Blockchain(object):
         # Create the genesis block
         self.new_block(previous_hash=1, proof=100)
 
-    def new_transactions(self, sender, recipient, amount):
+    def new_transaction(self, sender, recipient, amount):
         """
         Creates a new transaction to go into the next mined Block
 
@@ -99,6 +99,41 @@ class Blockchain(object):
     def last_block(self):
         return self.chain[-1]
 
+    def proof_of_work(self, block):
+        """
+        Simple Proof of Work Algorithm
+        Stringify the block and look for a proof.
+        Loop through possibilities, checking each one against `valid_proof`
+        in an effort to find a number that is a valid proof
+        :return: A valid proof for the provided block
+        """
+        # TODO
+        block_string = json.dumps(block, sort_keys=True)
+        proof = 0
+        # return proof
+        while self.valid_proof(block_string, proof) is False:
+            proof += 1
+        return proof
+
+    @staticmethod
+    def valid_proof(block_string, proof):
+        """
+        Validates the Proof:  Does hash(block_string, proof) contain 3
+        leading zeroes?  Return true if the proof is valid
+        :param block_string: <string> The stringified block to use to
+        check in combination with `proof`
+        :param proof: <int?> The value that when combined with the
+        stringified previous block results in a hash that has the
+        correct number of leading zeroes.
+        :return: True if the resulting hash is a valid proof, False otherwise
+        """
+        # TODO
+        guess = block_string + str(proof)
+        guess = guess.encode()
+        hash_value = hashlib.sha256(guess).hexdigest()
+        # return True or False
+        return hash_value[:6] == '000000'
+
 
 # Instantiate our Node
 app = Flask(__name__)
@@ -112,25 +147,33 @@ blockchain = Blockchain()
 
 @app.route('/mine', methods=['POST'])
 def mine():
-    # receive and validate OR reject a new proof sent by a client
-    # use data = request.get_json() to pull data out of the POST
     data = request.get_json()
-    # check that proof and id are present
-    # return a 400 error using jsonify(response) with a 'message'
-    # this message should indicate success or failure
-    if data['id'] and data['proof']:
-        # reward them for successful proof
-        blockchain.new_transactions(
+    if 'id' not in data or 'proof' not in data:
+        response = {'message': 'missing values'}
+        return jsonify(response), 400
+    # Run the proof of work algorithm to get the next proof
+    # print("We shall now mine a block!")
+    proof = data['proof']
+    last_block = blockchain.last_block
+    block_string = json.dumps(last_block, sort_keys=True)
+    if blockchain.valid_proof(block_string, proof):
+        # lets mine a new block, and return a success!
+        blockchain.new_transaction(
             sender="0",
             recipient=data['id'],
             amount=1
         )
-        response = {'message': 'New Block Forged'}
-        blockchain.new_block(data['proof'])
+        new_block = blockchain.new_block(proof)
+        response = {
+            'block': new_block
+        }
         return jsonify(response), 200
     else:
-        response = {'message': 'invalid ID or proof'}
-        return jsonify(response), 400
+        # respond with an error message
+        response = {
+            'message': 'Proof is invalid'
+        }
+        return jsonify(response), 200
 
 
 @app.route('/chain', methods=['GET'])
@@ -159,7 +202,7 @@ def new_transaction():
         return jsonify(response), 400
 
     # create the new transaction
-    index = blockchain.new_transactions(
+    index = blockchain.new_transaction(
         data['sender'], data['recipient'], data['amount'])
     response = {
         'message': f'Transaction will be posted in block with index {index}'}

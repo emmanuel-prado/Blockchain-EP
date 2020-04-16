@@ -129,6 +129,36 @@ node_identifier = str(uuid4()).replace('-', '')
 blockchain = Blockchain()
 
 
+# @app.route('/mine', methods=['POST'])
+# def mine():
+#     data = request.get_json()
+#     if 'id' not in data or 'proof' not in data:
+#         response = {'message': 'missing values'}
+#         return jsonify(response), 400
+#     # Run the proof of work algorithm to get the next proof
+#     # print("We shall now mine a block!")
+#     proof = data['proof']
+#     last_block = blockchain.last_block
+#     block_string = json.dumps(last_block, sort_keys=True)
+#     if blockchain.valid_proof(block_string, proof):
+#         # lets mine a new block, and return a success!
+#         blockchain.new_transaction(
+#             sender="0",
+#             recipient=data['id'],
+#             amount=1
+#         )
+#         new_block = blockchain.new_block(proof)
+#         response = {
+#             'block': new_block
+#         }
+#         return jsonify(response), 200
+#     else:
+#         # respond with an error message
+#         response = {
+#             'message': 'Proof is invalid'
+#         }
+#         return jsonify(response), 200
+
 @app.route('/mine', methods=['GET'])
 def mine():
     # Run the proof of work algorithm to get the next proof
