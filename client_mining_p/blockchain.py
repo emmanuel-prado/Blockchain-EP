@@ -119,6 +119,12 @@ def mine():
     # return a 400 error using jsonify(response) with a 'message'
     # this message should indicate success or failure
     if data['id'] and data['proof']:
+        # reward them for successful proof
+        blockchain.new_transactions(
+            sender="0",
+            recipient=data['id'],
+            amount=1
+        )
         response = {'message': 'New Block Forged'}
         blockchain.new_block(data['proof'])
         return jsonify(response), 200
@@ -141,6 +147,23 @@ def full_chain():
 def final_block():
     response = blockchain.last_block
     return jsonify(response), 200
+
+
+@app.route('/transactions/new', methods=['POST'])
+def new_transaction():
+    data = request.get_json()
+
+    # check that required fields are present
+    if 'recipient' not in data or 'amount' not in data or 'sender' not in data:
+        response = {'message': 'Error: missing values'}
+        return jsonify(response), 400
+
+    # create the new transaction
+    index = blockchain.new_transactions(
+        data['sender'], data['recipient'], data['amount'])
+    response = {
+        'message': f'Transaction will be posted in block with index {index}'}
+    return jsonify(response)
 
 
 # Run the program on port 5000
